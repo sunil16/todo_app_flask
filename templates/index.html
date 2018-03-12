@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <title>Todo App</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="static/css/style.css" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+</head>
+<body>
+
+<div class="container-fluid">
+  <div id="myDIV" class="CreateTask header row ">
+    <h2 style="margin:6px">My To Do List</h2>
+            <form   action="{{ url_for('add') }}" method="POST">
+                <input type="text"  id="title" name="todoitem" placeholder="Title" required>
+                <input type="text" id="datepicker" name="todoitemdate" placeholder="Due date" required>
+                <input id="submit" type="submit" value="Add Task" onclick="check();">
+            </form>
+  </div>
+  <div class="row">
+    <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for Titles..">
+    <select id="dropdown">
+      <option value="Today" >Today</option>
+      <option value="Week">Week</option>
+      <option value="Next Week">Next Week</option>
+      <option value="Over Due Date">Over Due Date</option>
+    </select>
+  </div>
+
+  <div class="row" id="today">
+    <div class="col-md-6" style="background-color:lavender;">
+      <h2>Pending Task</h2>
+      <ul id="myid" class="left_message">
+              {% for todo in incomplete %}
+              <li  class="taskli" >Title:- {{ todo.text }} </br> Due-date:- {{ todo.due_date }}
+            </br>  <button class="addsubt">Add Subtask</button>
+          </br><a type="button" href="{{ url_for('complete', id=todo.id) }}">Mark As Complete</a>
+        </br><a type="button" href="{{ url_for('delete', id=todo.id) }}">Remove</a>
+                <h4> Sub Tasks</h4>
+                  {% for item in subtask if item.todo_id == todo.id %}
+                    <p style="padding-left:20px">Title:- {{ item.text }} </br> Due-date:- {{item.due_date}}
+                    </br><a type="button" href="{{ url_for('completesubtask', id=item.id) }}">Mark As Complete</a>
+                  </br><a type="button" href="{{ url_for('deletesubtask', id=item.id) }}">Remove</a></p>
+
+                    {% else %}
+                  {% endfor %}
+                  <div class="CreateSubTask row">
+                      <form action="{{ url_for('addsubtask',todo_id=todo.id) }}" method="POST">
+                          <input type="text"   class="datepicker1" name="todoitemdate" placeholder="Due Date" required>
+                          <input type="text"   name="todoitem" placeholder="Title" required>
+                          <input id="submitsubtask" type="submit" value="Add Sub Task"></input>
+                      </form>
+                  </div>
+              </li>
+
+              {% endfor %}
+          </ul>
+    </div>
+
+        <div class="col-md-6" style="background-color:lavenderblush;">
+          <h2>Completed Task</h2>
+              <ul class="left_message">
+                  {% for todo in complete %}
+                      <li style="font-size: 10pt">Title:- {{ todo.text }} </br> Due-date:- {{ todo.due_date }}
+                       <h6>Completed Sub Task</h6>
+                    <!-- <ul class="left_message"> -->
+                      {% for sbt in completesbtask %}
+                        {%if sbt.todo_id == todo.id %}
+                        <p style="padding-left:20px">Title:- {{ sbt.text }} </br> Due-date:- {{sbt.due_date}}
+                        </p>
+                        {% endif %}
+                      {% endfor %}
+
+                        </li>
+
+                  {% endfor %}
+              </ul>
+
+        </div>
+
+  </div>
+
+
+  <!-- week data -->
+  <div class="row" id="week">
+    <div class="col-md-6" style="background-color:lavender;">
+      <h2>Pending Task</h2>
+      <ul id="myid" class="left_message">
+              {% for todo in week_incom %}
+              <li  class="taskli" >Title:- {{ todo.text }} </br> Due-date:- {{ todo.due_date }}
+            </br>  <button class="addsubt">Add Subtask</button>
+          </br><a type="button" href="{{ url_for('complete', id=todo.id) }}">Mark As Complete</a>
+        </br><a type="button" href="{{ url_for('delete', id=todo.id) }}">Remove</a>
+                <h4> Sub Tasks</h4>
+                  {% for item in week_subcom %}
+                    {% if item.todo_id == todo.id %}
+                    <p style="padding-left:20px">Title:- {{ item.text }} </br> Due-date:- {{item.due_date}}
+                    </br><a type="button" href="{{ url_for('completesubtask', id=item.id) }}">Mark As Complete</a>
+                  </br><a type="button" href="{{ url_for('deletesubtask', id=item.id) }}">Remove</a></p>
+
+                    {% endif %}
+                  {% endfor %}
+                  <div class="CreateSubTask row">
+                      <form action="{{ url_for('addsubtask',todo_id=todo.id) }}" method="POST">
+                          <input type="text"   class="datepicker1" name="todoitemdate" placeholder="Due Date" required>
+                          <input type="text"   name="todoitem" placeholder="Title" required>
+                          <input id="submitsubtask" type="submit" value="Add Sub Task"></input>
+                      </form>
+                  </div>
+              </li>
+              {% endfor %}
+          </ul>
+    </div>
+
+
+    <div class="col-md-6" style="background-color:lavenderblush;">
+      <h2>Completed Task</h2>
+          <ul class="left_message">
+              {% for todo in week_com %}
+                  <li style="font-size: 10pt">Title:- {{ todo.text }} </br> Due-date:- {{ todo.due_date }}
+                   <h6>Completed Sub Task</h6>
+                <!-- <ul class="left_message"> -->
+                  {% for sbt in week_subcom %}
+                    {%if sbt.todo_id == todo.id %}
+                    <p style="padding-left:20px">Title:- {{ sbt.text }} </br> Due-date:- {{sbt.due_date}}
+                    </p>
+                    {% endif %}
+                  {% endfor %}
+
+                    </li>
+
+              {% endfor %}
+          </ul>
+
+    </div>
+
+  </div>
+
+  <!-- next week data -->
+  <div class="row" id="nextweek">
+    <div class="col-md-6" style="background-color:lavender;">
+      <h2>Pending Task</h2>
+      <ul id="myid" class="left_message">
+              {% for todo in next_week_incom %}
+              <li  class="taskli" >Title:- {{ todo.text }} </br> Due-date:- {{ todo.due_date }}
+            </br>  <button class="addsubt">Add Subtask</button>
+          </br><a type="button" href="{{ url_for('complete', id=todo.id) }}">Mark As Complete</a>
+        </br><a type="button" href="{{ url_for('delete', id=todo.id) }}">Remove</a>
+                <h4> Sub Tasks</h4>
+                  {% for item in next_week_subcom if item.todo_id == todo.id %}
+                    <p style="padding-left:20px">Title:- {{ item.text }} </br> Due-date:- {{item.due_date}}
+                    </br><a type="button" href="{{ url_for('completesubtask', id=item.id) }}">Mark As Complete</a>
+                  </br><a type="button" href="{{ url_for('deletesubtask', id=item.id) }}">Remove</a></p>
+
+                    {% else %}
+                  {% endfor %}
+                  <div class="CreateSubTask row">
+                      <form action="{{ url_for('addsubtask',todo_id=todo.id) }}" method="POST">
+                          <input type="text"  class="datepicker1" name="todoitemdate" placeholder="Due Date" required>
+                          <input type="text"    name="todoitem" placeholder="Title" required>
+                          <input id="submitsubtask" type="submit" value="Add Sub Task"></input>
+                      </form>
+                  </div>
+              </li>
+
+              {% endfor %}
+          </ul>
+    </div>
+
+
+    <div class="col-md-6" style="background-color:lavenderblush;">
+      <h2>Completed Task</h2>
+          <ul class="left_message">
+              {% for todo in next_week_com %}
+                  <li style="font-size: 10pt">Title:- {{ todo.text }} </br> Due-date:- {{ todo.due_date }}
+                   <h6>Completed Sub Task</h6>
+                <!-- <ul class="left_message"> -->
+                  {% for sbt in next_week_subcom %}
+                    {%if sbt.todo_id == todo.id %}
+                    <p style="padding-left:20px">Title:- {{ sbt.text }} </br> Due-date:- {{sbt.due_date}}
+                    </p>
+                    {% endif %}
+                  {% endfor %}
+
+                    </li>
+
+              {% endfor %}
+          </ul>
+
+    </div>
+
+  </div>
+
+  <!-- over due_date data -->
+  <div class="row" id="overduedate">
+    <div class="col-md-6" style="background-color:lavender;">
+      <h2>Pending Task</h2>
+      <ul id="myid" class="left_message">
+              {% for todo in overduedate_week_incom %}
+              <li  class="taskli" >Title:- {{ todo.text }} </br> Due-date:- {{ todo.due_date }}
+            </br>  <button class="addsubt">Add Subtask</button>
+          </br><a type="button" href="{{ url_for('complete', id=todo.id) }}">Mark As Complete</a>
+        </br><a type="button" href="{{ url_for('delete', id=todo.id) }}">Remove</a>
+                <h4> Sub Tasks</h4>
+                  {% for item in overduedate_week_subcom if item.todo_id == todo.id %}
+                    <p style="padding-left:20px">Title:- {{ item.text }} </br> Due-date:- {{item.due_date}}
+                    </br><a type="button" href="{{ url_for('completesubtask', id=item.id) }}">Mark As Complete</a>
+                  </br><a type="button" href="{{ url_for('deletesubtask', id=item.id) }}">Remove</a></p>
+
+                    {% else %}
+                  {% endfor %}
+                  <div class="CreateSubTask row">
+                      <form action="{{ url_for('addsubtask',todo_id=todo.id) }}" method="POST">
+                          <input type="text"  class="datepicker1" name="todoitemdate" placeholder="Due Date" required>
+                          <input type="text"  name="todoitem" placeholder="Title" required>
+                          <input id="submitsubtask" type="submit" value="Add Sub Task"></input>
+                      </form>
+                  </div>
+              </li>
+
+              {% endfor %}
+          </ul>
+    </div>
+
+
+    <div class="col-md-6" style="background-color:lavenderblush;">
+      <h2>Completed Task</h2>
+          <ul class="left_message">
+              {% for todo in overduedate_week_com %}
+                  <li style="font-size: 10pt">Title:- {{ todo.text }} </br> Due-date:- {{ todo.due_date }}
+                   <h6>Completed Sub Task</h6>
+
+                  {% for sbt in overduedate_week_subcom %}
+                    {%if sbt.todo_id == todo.id %}
+                    <p style="padding-left:20px">Title:- {{ sbt.text }} </br> Due-date:- {{sbt.due_date}}
+                    </p>
+                    {% endif %}
+                  {% endfor %}
+
+                    </li>
+
+              {% endfor %}
+          </ul>
+
+    </div>
+
+  </div>
+
+
+</div>
+
+  <script src="static/js/script.js"></script>
+
+</body>
+</html>
