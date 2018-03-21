@@ -14,6 +14,9 @@ from datetime import date, timedelta
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '7d441f27d441f27567d441f2b6176a'
+app.config['TESTING'] = True
+app.config['DEBUG'] = True
+
 
 APP_ENV = os.environ.get('APP_ENV') or 'local'
 INI_FILE = os.path.join(
@@ -41,6 +44,7 @@ class Todo(db.Model):
     complete = db.Column(db.Boolean)
     due_date = db.Column(db.DATE)
     created_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
     members = relationship('Subtask', backref="Subtask", cascade="all, delete-orphan", lazy='dynamic')
 
 
@@ -235,7 +239,6 @@ def complete(id):
 
 @app.route('/completesubtask/<id>')
 def completesubtask(id):
-
     subt = Subtask.query.filter_by(id=int(id)).first()
     subt.complete = True
     db.session.commit()
