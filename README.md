@@ -16,3 +16,8 @@ to open : http://127.0.0.1:5000/
 Ubuntu 16.04 LTS
 
 python 2.7
+
+
+### To run testcases ####
+
+To run : $py.test -q test_api.py
